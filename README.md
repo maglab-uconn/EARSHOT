@@ -17,6 +17,49 @@
     pip install tensorflow, librosa, matplotlib
     ```
 
+## Pattern generation
+
+You can skip this part when you are using pre-generated input file at [Before starting](#Before-starting)
+
+### Command
+
+```
+python Pattern_Generator.py [parameters]
+```
+
+### Parameters
+
+* `-p <path>`
+    * Set the voice files path
+    * This parameter is required.
+
+* `-w <int>`
+    * Determines the window length of spectrogram. The unit is milliseconds.
+    * The default value is 10.
+
+* `-s <int>`
+    * Determine the semantic pattern's total size.
+    * The default value is 300.
+
+* `-a <int>`
+    * Determine how many units have 1 and other units have 0.
+    * For example, if '-s' parameter is 300 and '-a' is 10, each semantic pattern has 10 units with 1 and 290 units with 0.
+    * The default value is 10.
+
+* `-f <path>`
+    * Set the lexicon file.
+    * The default value is 'Pronunciation_Data_1K.txt'.
+    * In the path which is set by '-p' parameter, there must be all voice files about all words in the lexicon file.
+
+### Execution examples
+
+```
+python Pattern_Generator.py -p './Pattern/Wav'
+python Pattern_Generator.py -p './Pattern/Wav' -w 10 -s 300  -a 10 -f Pronunciation_Data_1K.txt
+```
+
+The exported file name is 'IM_Spectrogram.OM_SRV.OS_{s}.AN_{a}.Size_{pattern size}.WL_{w}.pickle'. The {} is changed by parameters.
+
 ## Simulation execution
 ### Command
 
