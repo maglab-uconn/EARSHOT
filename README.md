@@ -153,7 +153,7 @@ python Result_Analysis.py -d ./Results/IDX_0/HM_LSTM.H_512.EM_M.ET_AGNES.IDX_0
 python Result_Analysis.py -d ./Results/IDX_2/HM_LSTM.H_512.EM_M.ET_BRUCE.IDX_2 -tw 5 -th 0.1
 ```
 
-## Hidden analysis
+## Hidden analysis - Diphone based
 
 ### Command
 
@@ -216,6 +216,69 @@ python RSA_Analysis.py [parameters]
 python RSA_Analysis.py -d ./Results/IDX_0/HM_LSTM.H_512.EM_M.ET_AGNES.IDX_0 -e 2000 -c 0.0 -pn 10000
 ```
 
+
+## Hidden analysis - Alignment based
+
+### Command
+
+```
+python Hidden_Analysis.Alignment.py [parameters]
+```
+
+### Parameters
+
+* `-d <path>`
+    * Results directory to run the analysis on.
+    * This parameter is required.
+    * Ex. `./Results/IDX_0/HM_LSTM.H_512.EM_M.ET_AGNES.IDX_0`
+
+* `-e <int>`
+    * The epoch to run the analysis on.
+    * This parameter is required.
+
+* `-v <path>`
+    * Alignment data directory to be used for hidden analysis
+    * This parameter is required.
+    * Ex. `./WAVS_ONLY_Padded_Alignment`
+
+### Execution examples
+
+```
+python Hidden_Analysis.Alignment.py -d ./Results/IDX_0/HM_LSTM.H_512.EM_M.ET_Fred.IDX_0 -e 4000 -v ./WAVS_ONLY_Padded_Alignment
+```
+
+## RSA analysis
+
+### Command
+
+```
+python RSA_Analysis.py [parameters]
+```
+
+### Parameters
+
+* `-d <path>`
+    * Results directory to run the analysis on.
+    * This parameter is required.
+    * Ex. `./Results/IDX_0/HM_LSTM.H_512.EM_M.ET_AGNES.IDX_0`
+
+* `-e <int>`
+    * The epoch to run the analysis on.
+    * To proceed with the RSA analysis, you must first perform a hidden analysis on the configured epoch.
+    * This parameter is required.
+
+* `-c <float>`
+    * Criterion of the PSI and FSI map to be used.
+
+* `-pn <int>`
+    * Number of permutation tests
+    * The default is 1000000.
+
+### Execution examples
+
+```
+python RSA_Analysis.py -d ./Results/IDX_0/HM_LSTM.H_512.EM_M.ET_AGNES.IDX_0 -e 2000 -c 0.0 -pn 10000
+```
 
 ## Generate figures by R script
 

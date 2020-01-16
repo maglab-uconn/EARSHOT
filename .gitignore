@@ -105,3 +105,9 @@ venv.bak/
 
 # data
 *.pickle
+Results/IDX_0/HM_LSTM.H_512.EM_M.ET_FRED.IDX_0/Checkpoint/checkpoint
+Results/IDX_0/HM_LSTM.H_512.EM_M.ET_FRED.IDX_0/Checkpoint/Checkpoint-0.data-00000-of-00001
+Results/IDX_0/HM_LSTM.H_512.EM_M.ET_FRED.IDX_0/Checkpoint/Checkpoint-0.index
+Results/IDX_0/HM_LSTM.H_512.EM_M.ET_FRED.IDX_0/Checkpoint/Checkpoint-0.meta
+x.bat
+.vscode/settings.json

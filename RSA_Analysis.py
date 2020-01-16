@@ -29,7 +29,7 @@ class RSA_Analyzer:
         self.mertic_Type_List = ['euclidean', 'correlation', 'cosine']
 
         self.Mesgarani_Distance_Load()
-        self.Data_Generate(data_Path);
+        self.Data_Generate(data_Path)
 
     def Mesgarani_Distance_Load(self):
         with open('Mesgarani_Distance.pickle', 'rb') as f:
@@ -138,7 +138,7 @@ class RSA_Analyzer:
 
     def Distance_Tri_Calc(self, array):
         # When we compute correlations, we only consider the off-diagonal
-        # elements that are in the lower triangle; doing the upper triangle
+        # elements that are in the lower triangle doing the upper triangle
         # would have gotten the same results
         distance_Tri = []
         for index in range(array.shape[0]):
@@ -172,15 +172,15 @@ class RSA_Analyzer:
         return fig
 
 if __name__ == '__main__':
-    argParser = argparse.ArgumentParser();
-    argParser.add_argument("-d", "--extract_dir", required= True);
-    argParser.add_argument("-e", "--epoch", required= True);
-    argParser.add_argument("-c", "--criterion", required= True);
-    argParser.add_argument("-pn", "--permutation_nums", required= False);
-    argument_Dict = vars(argParser.parse_args());
+    argParser = argparse.ArgumentParser()
+    argParser.add_argument("-d", "--extract_dir", required= True)
+    argParser.add_argument("-e", "--epoch", required= True)
+    argParser.add_argument("-c", "--criterion", required= True)
+    argParser.add_argument("-pn", "--permutation_nums", required= False)
+    argument_Dict = vars(argParser.parse_args())
 
-    selected_Epoch = int(argument_Dict["epoch"]);
-    selected_Criterion = float(argument_Dict["criterion"]);
+    selected_Epoch = int(argument_Dict["epoch"])
+    selected_Criterion = float(argument_Dict["criterion"])
     permutation_Nums = int(argument_Dict['permutation_nums'] or 1000000)
 
     for data_Type in ['PSI', 'FSI']:

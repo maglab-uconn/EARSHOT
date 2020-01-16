@@ -59,7 +59,7 @@ for (epoch in epoch_List)
     flow_Data.Feature$row_Name <- with(flow_Data.Feature, factor(row_Name, levels=rev(row_Name.Feature), ordered=TRUE))
     
     
-    plot_List <- list();
+    plot_List <- list()
     for(start_Unit_Index in seq(0, hidden_Unit - 1, unit_per_Row))
     {
       flow_Data.Phoneme.Subset <- subset(flow_Data.Phoneme, unit_Index %in% seq(start_Unit_Index, start_Unit_Index + unit_per_Row - 1, 1))

@@ -2,11 +2,11 @@
 # https://github.com/carpedm20/multi-speaker-tacotron-tensorflow/blob/master/audio/__init__.py
 # I only changed the hparams to usual parameters from original code.
 
-import numpy as np;
-import tensorflow as tf;
-from scipy import signal;
-import librosa.filters;
-import librosa;
+import numpy as np
+import tensorflow as tf
+from scipy import signal
+import librosa.filters
+import librosa
 
 
 
@@ -69,7 +69,7 @@ def _griffin_lim_tensorflow(S, griffin_lim_iters = 60):
     Based on https://github.com/Kyubyong/tensorflow-exercises/blob/master/Audio_Processing.ipynb
     '''
     with tf.variable_scope('griffinlim'):
-        # TensorFlow's stft and istft operate on a batch of spectrograms; create batch of size 1
+        # TensorFlow's stft and istft operate on a batch of spectrograms create batch of size 1
         S = tf.expand_dims(S, 0)
         S_complex = tf.identity(tf.cast(S, dtype=tf.complex64))
         y = _istft_tensorflow(S_complex)
