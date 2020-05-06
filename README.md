@@ -19,7 +19,7 @@
 
 ## Pattern generation
 
-You can skip this part when you are using pre-generated input file at [Before starting](#Before-starting)
+You can skip this part when you are using a pre-generated input file at [Before starting](#Before-starting)
 
 ### Command
 
@@ -29,36 +29,62 @@ python Pattern_Generator.py [parameters]
 
 ### Parameters
 
-* `-p <path>`
-    * Set the voice files path
-    * This parameter is required.
+* `-h`
+    * Prints a verbose help message about the other parameters.
 
-* `-w <int>`
-    * Determines the window length of spectrogram. The unit is milliseconds.
-    * The default value is 10.
 
-* `-s <int>`
-    * Determine the semantic pattern's total size.
-    * The default value is 300.
+* `-p,--path <path>`
+    * Set the path to the wav files that construct the inputs.
+    * Required.
 
-* `-a <int>`
-    * Determine how many units have 1 and other units have 0.
-    * For example, if '-s' parameter is 300 and '-a' is 10, each semantic pattern has 10 units with 1 and 290 units with 0.
-    * The default value is 10.
 
-* `-f <path>`
-    * Set the lexicon file.
-    * The default value is 'Pronunciation_Data_1K.txt'.
-    * In the path which is set by '-p' parameter, there must be all voice files about all words in the lexicon file.
+* `-m,--mode <string>`
+    * Semantic mode. Can be either "SRV" (creates sparse random vectors) or "Word2Vec" (pre-trained word vectors from, e. g., a Distributional Semantics Model)
+    * Optional, defaults to SRV.
+
+
+* `-w,--winlength <int>`
+    * Sets the window length for the spectrogram in milliseconds.
+    * Defaults to 10.
+
+
+* `-f,--pronfile <filename>`
+    * Name/location of lexicon/pronunciation file. The file is a list of words with phonological transcriptions.
+    * Optional, defaults to Pronunciation_Data_1K.txt.
+
+
+* `-s,--semdim <int>`
+    * Semantic dimension - length of the semantic vectors. This parameter is ignored if --mode=Word2Vec, since the semantic dimension is then determined by the size of the supplied vectors.
+    * Optional, defaults to 300.
+
+
+* `-n,--nnz <int>`
+    * Number of nonzero (= 1) elements in the sparse random vectors. Even if --mode=Word2Vec, this parameter may be used since the model supplements the set of semantic vectors with SRVs for any out-of-vocabulary items.
+    * Optional, defaults to 10.
+
+
+* `-v,--w2v <filename>`
+    * Location of vector representations of words used if --mode=Word2Vec.  This can be a gensim model or a pickle with a word:vector dictionary; the model auto-sniffs the filetype.
+    * Required if --mode=Word2Vec, otherwise ignored/unused.
+
+
+* `-c,--noclip <bool>`
+    * Keep full-range semantic vectors (True) or clip to {0,1} (False).
+    * Optional, defaults to True, has no effect if --mode="SRV".
+
 
 ### Execution examples
 
+Basic pattern file with default pronunciation file, SRVs of length 300 with 10 nonzero elements, 10 ms spectral windows:
 ```
-python Pattern_Generator.py -p './Pattern/Wav'
-python Pattern_Generator.py -p './Pattern/Wav' -w 10 -s 300  -a 10 -f Pronunciation_Data_1K.txt
+python Pattern_Generator.py --path=./Pattern/Wav
+```
+Patterns using DSM vectors for semantics and a custom pronunciation file:
+```
+python Pattern_Generator.py --path=./Pattern/Wav --pronfile=My_Lexicon.txt --mode=Word2Vec --w2v='my_dsm_vectors.pickle'
 ```
 
-The exported file name is 'IM_Spectrogram.OM_SRV.OS_{s}.AN_{a}.Size_{pattern size}.WL_{w}.pickle'. The {} is changed by parameters.
+The exported file name is long but transparent; it contains information about most of the parameters (number of patterns, semantic mode and sizes, window length). It does not indicate either the pronunciation file or the file used for semantic vecors (if `--mode=Word2Vec`).
 
 ## Simulation execution
 ### Command
