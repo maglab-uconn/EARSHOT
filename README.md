@@ -1,5 +1,13 @@
 # EARS User Guide
 
+
+## EARSHOT paper 
+
+Magnuson, J.S., You, H., Luthra, S., Li, M., Nam, H., Escabí, M., Brown, K., Allopenna, P.D., Theodore, R.M., Monto, N., & Rueckl, J.G. (2020). EARSHOT: A minimal neural network model of incremental human speech recognition. Cognitive Science, 44, e12823. http://dx.doi.org/10.1111/cogs.12823 -- 
+[PDF](https://magnuson.psy.uconn.edu/wp-content/uploads/sites/1140/2020/04/EARSHOT_cogsci_2020.pdf) -- 
+[Supplmentary materials](https://magnuson.psy.uconn.edu/wp-content/uploads/sites/1140/2020/04/earshot_CS_brief_report_REV_2020.04.10_supp.pdf)
+
+
 ## Before starting
 
 * Download input file `Pattern_Dict.IM_Spectrogram.OM_SRV.AN_10.Size_10000.WL_10.pickle` [here](https://drive.google.com/file/d/1pujVHSPtwXWZiQeutFJwxdsz1mz0Lddi/view)
