@@ -47,8 +47,10 @@ class Pattern_Extractor:
         self.Spectrogram_Generate()
 
         if self.semantic_Mode == "SRV":
+            print('SRV Semantics . . .')
             self.Semantic_Generate_SRV()
         elif self.semantic_Mode == "Word2Vec":
+            print('Word2Vec Semantics . . .')
             self.word2Vec_DB_File = word2Vec_DB_File
             self.word2Vec_Round = word2Vec_Round
             self.Semantic_Generate_Word2Vec()
@@ -144,7 +146,7 @@ class Pattern_Extractor:
                 fake_count += 1
                 word2vec_Model[word] = r_sv
 
-        print(fak_count,'words not found in word encodings; SRVs were used for these words.')
+        print(fake_count,'words not found in word encodings; SRVs were used for these words.')
 
         if not self.no_clip:
             print('Clipping vectors . . .')
@@ -159,7 +161,7 @@ class Pattern_Extractor:
             if not self.no_clip:
                 self.pattern_Dict[word, talker]["Semantic"] = np.clip(np.sign(word2vec_Model[word]), 0, 1)
             else:
-                self.pattern_Dict[word,talker]["Semantic"] = word2vec_Model[word]
+                self.pattern_Dict[word, talker]["Semantic"] = word2vec_Model[word]
 
     def Category_Dict_Generate(self):
         print("Category dict generating...")

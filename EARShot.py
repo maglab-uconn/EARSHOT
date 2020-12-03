@@ -36,7 +36,7 @@ class Model:
         ):
         #ctypes.windll.kernel32.SetConsoleTitleW(extract_Dir.replace("_", ":").replace(".", " "))   #If you run this script in the linux or mac, remove this line.
 
-        self.tf_Session = tf.Session()        
+        self.tf_Session = tf.Session()
 
         self.acoustic_Size = 256
         self.semantic_Size = 300
@@ -45,9 +45,9 @@ class Model:
         self.hidden_Type = hidden_Type
         self.hidden_Reset = hidden_Reset
         self.extract_Dir = extract_Dir
-        
+
         self.Placeholder_Generate()
-        
+
         #Pattern data is generated from other thread.
         self.pattern_Feeder = Pattern_Feeder(
             placeholder_List = [self.acoustic_Placeholder, self.semantic_Placeholder, self.length_Placeholder],
@@ -69,7 +69,7 @@ class Model:
     #Initialize the tensor placeholder
     def Placeholder_Generate(self):
         with tf.variable_scope('placeHolders') as scope:
-            self.acoustic_Placeholder = tf.placeholder(tf.float32, shape=(None, None, self.acoustic_Size), name = "acoustic_Placeholder") #(batch, length, size)            
+            self.acoustic_Placeholder = tf.placeholder(tf.float32, shape=(None, None, self.acoustic_Size), name = "acoustic_Placeholder") #(batch, length, size)
             self.semantic_Placeholder = tf.placeholder(tf.float32, shape=(None, None, self.semantic_Size), name = "semantic_Placeholder") #(batch, size)
             self.length_Placeholder = tf.placeholder(tf.int32, shape=(None,), name = "length_Placeholder")   #(batch)
 
@@ -86,12 +86,12 @@ class Model:
                 )
 
             #RNN. Model can select four types hidden.
-            #Previous RNN state is for the no reset.       
+            #Previous RNN state is for the no reset.
             if self.hidden_Type == "LSTM":
                 rnn_Cell = LSTMCell(self.hidden_Size)
                 previous_RNN_State = tf.Variable(
                     initial_value = LSTMStateTuple(
-                        c = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)), 
+                        c = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)),
                         h = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size))
                         ),
                     trainable = False
@@ -104,7 +104,7 @@ class Model:
                 rnn_Cell = SCRNCell(self.hidden_Size)
                 previous_RNN_State = tf.Variable(
                     initial_value = SCRNStateTuple(
-                        s = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)), 
+                        s = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)),
                         h = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size))
                         ),
                     trainable = False
@@ -125,8 +125,8 @@ class Model:
                 decoder_Initial_State = previous_RNN_State[:batch_Size]
 
             decoder = BasicDecoder(
-                cell=rnn_Cell, 
-                helper=helper, 
+                cell=rnn_Cell,
+                helper=helper,
                 initial_state=decoder_Initial_State
                 )
             outputs, final_State, _ = dynamic_decode(
@@ -134,27 +134,31 @@ class Model:
                 output_time_major = False,
                 impute_finished = True
                 )
-            
+
             hidden_Activation = outputs.rnn_output
 
             #Semantic   (hidden_size -> semantic_size)
             semantic_Logits = tf.layers.dense(
                 inputs = hidden_Activation,
-                units = self.semantic_Size,                
+                units = self.semantic_Size,
                 use_bias=True,
                 name = "semantic_Logits"
                 )
 
         #Back-prob.
         with tf.variable_scope('training_Loss') as scope:
-            loss_Calculation = tf.nn.sigmoid_cross_entropy_with_logits(                
-                labels = self.semantic_Placeholder,
-                logits = semantic_Logits
-                )
+            #loss_Calculation = tf.nn.sigmoid_cross_entropy_with_logits(
+            #    labels = self.semantic_Placeholder,
+            #    logits = semantic_Logits
+            #    )
 
-            loss = tf.reduce_mean(loss_Calculation)
-            loss_Display = tf.reduce_mean(loss_Calculation, axis=[0,2])    #This is for the display. There is no meaning.
-            
+            #loss = tf.reduce_mean(loss_Calculation)
+            #loss_Display = tf.reduce_mean(loss_Calculation, axis=[0,2])    #This is for the display. There is no meaning.
+
+            loss_Calculation = tf.nn.l2_loss(t=tf.nn.tanh(semantic_Logits))
+            loss = loss_Calculation
+            loss_Display = loss_Calculation
+
             global_Step = tf.Variable(0, name='global_Step', trainable = False)
 
             #Noam decay of learning rate
@@ -196,7 +200,7 @@ class Model:
             if self.hidden_Type == "LSTM":
                 backup_RNN_State = tf.Variable(
                     initial_value = LSTMStateTuple(
-                        c = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)), 
+                        c = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)),
                         h = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size))
                         ),
                     trainable = False
@@ -204,7 +208,7 @@ class Model:
             elif self.hidden_Type == "SCRN":
                 backup_RNN_State = tf.Variable(
                     initial_value = SCRNStateTuple(
-                        s = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)), 
+                        s = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)),
                         h = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size))
                         ),
                     trainable = False
@@ -224,7 +228,7 @@ class Model:
                     zero_RNN_State_Assign = tf.assign(
                         ref= previous_RNN_State,
                         value = LSTMStateTuple(
-                            c = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)), 
+                            c = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)),
                             h = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size))
                             )
                         )
@@ -232,7 +236,7 @@ class Model:
                     zero_RNN_State_Assign = tf.assign(
                         ref= previous_RNN_State,
                         value = SCRNStateTuple(
-                            s = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)), 
+                            s = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size)),
                             h = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size))
                             )
                         )
@@ -241,27 +245,28 @@ class Model:
                         ref= previous_RNN_State,
                         value = tf.zeros(shape=(self.pattern_Feeder.batch_Size, self.hidden_Size))
                         )
-            
+
             restore_RNN_State_Assign = tf.assign(
                 ref= previous_RNN_State,
                 value = backup_RNN_State
                 )
 
-            semantic_Activation = tf.nn.sigmoid(semantic_Logits)
-                    
+            #semantic_Activation = tf.nn.sigmoid(semantic_Logits)
+            semantic_Activation = tf.nn.tanh(semantic_Logits)
+
         self.training_Tensor_List = [global_Step, learning_Rate, loss_Display, optimize]
         if not self.hidden_Reset:   #If hidden is not reset, model use the save function.
             self.training_Tensor_List.append(rnn_State_Assign)
-        
+
         self.test_Mode_Turn_On_Tensor_List = [backup_RNN_State_Assign, zero_RNN_State_Assign]  #Hidden state backup
         self.test_Mode_Turn_Off_Tensor_List = [restore_RNN_State_Assign]   #Hidden state restore
 
         self.test_Tensor_List = [global_Step, semantic_Activation] #In test, we only need semantic activation
-        
+
         self.hidden_Plot_Tensor_List = [tf.transpose(hidden_Activation, perm=[0, 2, 1])]   #In hidden analysis, we only need hidden activation.
 
         self.tf_Session.run(tf.global_variables_initializer()) #Initialize the weights
-        
+
     #Checkpoint load
     def Restore(self, force_Overwrite = False):
         if not os.path.exists(self.extract_Dir + "/Checkpoint"):
@@ -300,7 +305,7 @@ class Model:
         checkpoint_Path = self.extract_Dir + "/Checkpoint/Checkpoint"
 
         while not self.pattern_Feeder.is_Finished or len(self.pattern_Feeder.pattern_Queue) > 0:    #When there is no more training pattern, the train function will be done.
-            current_Epoch, is_New_Epoch, feed_Dict = self.pattern_Feeder.Get_Pattern()            
+            current_Epoch, is_New_Epoch, feed_Dict = self.pattern_Feeder.Get_Pattern()
 
             #Initial test and save
             if is_New_Epoch and current_Epoch % test_Timing == 0:
@@ -336,31 +341,31 @@ class Model:
 
         semantic_Activation_List = []
 
-        test_Feed_Dict_List = self.pattern_Feeder.Get_Test_Pattern_List()        
+        test_Feed_Dict_List = self.pattern_Feeder.Get_Test_Pattern_List()
 
         for feed_Dict in test_Feed_Dict_List:
             global_Step, semantic_Activation = self.tf_Session.run(
                 fetches = self.test_Tensor_List,
                 feed_dict = feed_Dict
-                )                        
+                )
             padding_Array = np.zeros((semantic_Activation.shape[0], self.pattern_Feeder.test_Max_Cycle, semantic_Activation.shape[2])) #Padding is for stacking the result data.
             padding_Array[:, :semantic_Activation.shape[1], :] = semantic_Activation
             semantic_Activation_List.append(padding_Array)
 
         self.tf_Session.run(self.test_Mode_Turn_Off_Tensor_List)     #Restore the hidden state
-         
+
         extract_Thread = Thread(target=self.Extract, args=(np.vstack(semantic_Activation_List).astype("float32"), epoch))
         extract_Thread.start()
 
         return extract_Thread
-             
+
     #Data extract
     def Extract(self, semantic_Activation, epoch):
         if not os.path.exists(self.extract_Dir + "/Result"):
             os.makedirs(self.extract_Dir + "/Result")
 
         #If there is no metadata, save the metadata
-        #In metadata, there are several basic hyper parameters, and the pattern information for result analysis.        
+        #In metadata, there are several basic hyper parameters, and the pattern information for result analysis.
         if not os.path.isfile(self.extract_Dir + "/Result/Metadata.pickle"):
             metadata_Dict = {}
             metadata_Dict["Acoustic_Size"] = self.acoustic_Size
@@ -368,11 +373,11 @@ class Model:
             metadata_Dict["Hidden_Size"] = self.hidden_Size
             metadata_Dict["Learning_Rate"] = self.learning_Rate
             metadata_Dict["Hidden_Type"] = self.hidden_Type
-            
+
             metadata_Dict["Pronunciation_Dict"] = self.pattern_Feeder.pronunciation_Dict
             metadata_Dict["Word_Index_Dict"] = self.pattern_Feeder.word_Index_Dict
             metadata_Dict["Category_Dict"] = self.pattern_Feeder.category_Dict
-            
+
             metadata_Dict["Pattern_Index_Dict"] = self.pattern_Feeder.test_Pattern_Index_Dict
             metadata_Dict["Target_Array"] = self.pattern_Feeder.target_Array   #[Pattern, 300]
             metadata_Dict["Cycle_Array"] = self.pattern_Feeder.test_Cycle_Pattern  #[Pattern]
@@ -380,7 +385,7 @@ class Model:
             metadata_Dict["Trained_Pattern_List"] = list(self.pattern_Feeder.training_Pattern_Dict.keys()) #'Trained' category patterns
             metadata_Dict["Excluded_Pattern_List"] = list(self.pattern_Feeder.excluded_Pattern_Dict.keys())    #'Excluded words' and 'excluded talkers' patterns
             metadata_Dict["Excluded_Talker"] = self.pattern_Feeder.excluded_Talker    #'Excluded words' and 'excluded talkers' patterns
-            
+
             with open(self.extract_Dir + "/Result/Metadata.pickle", "wb") as f:
                 pickle.dump(metadata_Dict, f, protocol=0)
 
@@ -388,7 +393,7 @@ class Model:
         result_Dict["Epoch"] = epoch
         result_Dict["Result"] = semantic_Activation
         result_Dict["Exclusion_Ignoring"] = self.pattern_Feeder.exclusion_Ignoring
-                
+
         with open(self.extract_Dir + "/Result/{:06d}.pickle".format(epoch), "wb") as f:
             pickle.dump(result_Dict, f, protocol=0)
 
@@ -412,7 +417,7 @@ if __name__ == "__main__":
     argParser.add_argument("-idx", "--index", required=False)  #This is just for identifier. This parameter does not affect the model's performance
     argParser.set_defaults(idx = None)
     argument_Dict = vars(argParser.parse_args())
-    
+
     hidden_Type = argument_Dict["hidden_type"].upper()
     hidden_Unit = int(argument_Dict["hidden_unit"])
     test_Timing = int(argument_Dict["test_timing"])
@@ -427,7 +432,8 @@ if __name__ == "__main__":
 
     #Pattern file is including spectrogram, semantic, cycle, pattern index, pronunciation dict, and phonetic competator information.
     #This method improves pattern generating speed, but it cannot be applied to the big lexicon project.
-    file_Name = "Pattern_Dict.IM_Spectrogram.OM_SRV.AN_10.Size_10000.WL_10.pickle"
+    #file_Name = "Pattern_Dict.IM_Spectrogram.OM_SRV.AN_10.Size_10000.WL_10.pickle"
+    file_Name = "EARSHOT_Input.IM_Spectrogram.WINLEN_10.MODE_Word2Vec.SEMSIZE_300.NNZ_10.PATSIZE_15000.pickle"
 
     extract_Dir_List = ["./Results/IDX_{}/HM_{}".format(simulation_Index, hidden_Type)]
     extract_Dir_List.append("H_{}".format(hidden_Unit))
@@ -440,13 +446,13 @@ if __name__ == "__main__":
 
     new_Model = Model(
         hidden_Size= hidden_Unit,
-        learning_Rate= 0.002, 
-        pattern_File=file_Name, 
+        learning_Rate= 0.002,
+        pattern_File=file_Name,
         pattern_Mode = "Normal", #"Normal" or "Truncated",
         partial_Exclusion_in_Training = exclusion_Mode,
         excluded_Talker = exclusion_Talker,
         exclusion_Ignoring = exclusion_Ignoring,
-        batch_Size= 1000, 
+        batch_Size= 1000,
         start_Epoch=start_Epoch,    #For restore
         max_Epoch=max_Epoch,
         metadata_File= metadata_File,
